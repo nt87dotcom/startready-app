@@ -647,6 +647,14 @@ Include exactly 3–5 strengths, 4–6 gaps, and 8–10 next steps. Be specific 
     }
     const data = await res.json();
 
+    // Handle Anthropic API errors
+    if (data.error) {
+      throw new Error(`API error: ${data.error.message || JSON.stringify(data.error)}`);
+    }
+    if (!data.content || !Array.isArray(data.content)) {
+      throw new Error(`Bad response: ${JSON.stringify(data).slice(0, 300)}`);
+    }
+
     const text = data.content.map(i => i.text || '').join('');
     const clean = text.replace(/```json|```/g, '').trim();
     reportData = { ...JSON.parse(clean), scores, bizType: selectedBiz };
